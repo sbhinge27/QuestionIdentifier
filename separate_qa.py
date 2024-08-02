@@ -1,6 +1,7 @@
 import fitz  # PyMuPDF
 import pandas as pd
 import re
+import os
 
 # Function to extract text from a PDF file
 def extract_text_from_pdf(pdf_path):
@@ -137,5 +138,14 @@ df = pd.DataFrame({
     'Answer': answers
 })
 
+# Ensure the 'qa' folder exists
+output_folder = 'qa'
+os.makedirs(output_folder, exist_ok=True)
+
+# Path to save the CSV file
+csv_path = os.path.join(output_folder, pdf_path + '.csv')
+
 # Save the DataFrame to a CSV file with UTF-8 encoding
-df.to_csv('questions_answers.csv', index=False, encoding='utf-8')
+df.to_csv(csv_path, index=False, encoding='utf-8')
+
+print(f"CSV file saved to {csv_path}")
