@@ -57,8 +57,9 @@ def merge_question_lines(lines):
                 merged_lines.append(line)
     return merged_lines
 
+pdf_name = 'Round4.pdf'
 # Path to the PDF file
-pdf_path = 'qa.pdf'
+pdf_path = 'imported_questions/' + pdf_name
 
 # Extract text from the PDF
 text = extract_text_from_pdf(pdf_path)
@@ -143,7 +144,7 @@ output_folder = 'qa'
 os.makedirs(output_folder, exist_ok=True)
 
 # Path to save the CSV file
-csv_path = os.path.join(output_folder, pdf_path + '.csv')
+csv_path = os.path.join(output_folder, pdf_name + '.csv')
 
 # Save the DataFrame to a CSV file with UTF-8 encoding
 df.to_csv(csv_path, index=False, encoding='utf-8')
