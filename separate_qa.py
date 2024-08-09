@@ -3,6 +3,8 @@ import pandas as pd
 import re
 import os
 
+type_of_file = "nonUSGO"
+
 # Function to extract text from a PDF file
 def extract_text_from_pdf(pdf_path):
     document = fitz.open(pdf_path)
@@ -11,7 +13,10 @@ def extract_text_from_pdf(pdf_path):
         page = document.load_page(page_num)
         rect = page.rect
         if page_num == 0:
-            height = 140
+            if type_of_file == "nonUSGO":
+                height = 70
+            else:
+                height = 140
         else:
             height = 50
         clip = fitz.Rect(0, height, rect.width, rect.height-height)
@@ -28,7 +33,8 @@ def clean_text(text):
     # Define specific headers and footers to exclude
     excluded_patterns = [
         r'^Extra Question',
-        r'Only read if moderator botches a question.'
+        r'Only read if moderator botches a question.',
+        r'Tossups'
         # Add more headers or footers if needed
     ]
 
@@ -57,7 +63,11 @@ def merge_question_lines(lines):
                 merged_lines.append(line)
     return merged_lines
 
-pdf_name = 'Round4.pdf'
+
+pdf_name = input("Enter pdf name: ") + ".pdf"
+
+
+
 # Path to the PDF file
 pdf_path = 'imported_questions/' + pdf_name
 
@@ -82,35 +92,39 @@ current_question = []
 current_answer = []
 
 # Regular expression to match question numbers at the beginning of the line
-question_number_pattern = re.compile(r'^\(\d+\)')
+question_number_pattern = re.compile(r'^\(\d+\)|^\d+\.')
+question_answer_pattern = re.compile('^(?i)answer:')
+
+count = 1
 
 # Process each line
 for line in lines:
     line = line.strip()  # Remove leading and trailing whitespace
-    if line.startswith("ANSWER:"):
+    if question_answer_pattern.match(line):
         # If the line starts with "ANSWER:", it's an answer
         current_answer.append(line.replace("ANSWER:", "").strip())
-        print(current_answer)
-    elif question_number_pattern.match(line):
+        #print(current_answer)
+    elif question_number_pattern.match(line) and (current_answer or count == 1):
         # If the line starts with a question number, start a new question
         if current_question:
             questions.append(" ".join(current_question).strip())
             answers.append(" ".join(current_answer).strip())
             current_question = []
             current_answer = []
+            count += 1
         line = question_number_pattern.sub("", line).strip()
-        #print(line)
+        print(line)
         current_question = [line]
-        print(current_question)
+        #print(current_question)
     elif line:
         # Continue adding lines to the current question or answer
         if current_answer:
             current_answer.append(line)
-            print(current_answer)
+            #print(current_answer)
             #print(line)
         else:
             current_question.append(line)
-            print(current_question)
+          #  print(current_question)
             #print(line)
 
 # Add any remaining question and answer if they exist
@@ -122,8 +136,8 @@ if current_answer:
 # Print lengths and samples of the lists for debugging
 print(f"Number of questions: {len(questions)}")
 print(f"Number of answers: {len(answers)}")
-print("Sample questions:", questions[:5])
-print("Sample answers:", answers[:5])
+print("Sample questions:", questions[0])
+print("Sample answers:", answers[0])
 
 # Handle length mismatch
 # If there are more questions than answers, add empty answers
