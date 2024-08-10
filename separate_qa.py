@@ -5,6 +5,10 @@ import os
 
 type_of_file = "nonUSGO"
 
+# Regular expression to match question numbers at the beginning of the line
+question_number_pattern = re.compile(r'^\(\d+\)|^\d+\.')
+question_answer_pattern = re.compile('(?i)^answer:')
+
 # Function to extract text from a PDF file
 def extract_text_from_pdf(pdf_path):
     document = fitz.open(pdf_path)
@@ -14,7 +18,7 @@ def extract_text_from_pdf(pdf_path):
         rect = page.rect
         if page_num == 0:
             if type_of_file == "nonUSGO":
-                height = 70
+                height = 50
             else:
                 height = 140
         else:
@@ -39,17 +43,25 @@ def clean_text(text):
     ]
 
     cleaned_lines = []
+    q1_read = False
     for line in lines:
         line = line.strip()  # Remove leading and trailing whitespace
-        if not any(re.match(pattern, line) for pattern in excluded_patterns):
-            cleaned_lines.append(line)
+        if not q1_read:
+            if question_number_pattern.match(line):
+                q1_read = True
+                cleaned_lines.append(line)
+        else:
+                cleaned_lines.append(line)
+
+        
+    
     
     return "\n".join(cleaned_lines)
 
 def merge_question_lines(lines):
     merged_lines = []
     buffer_line = ""
-    question_number_pattern = re.compile(r'^\(\d+\)\s*$')
+    question_number_pattern = re.compile(r'^\(\d+\)|^\d+\.')
 
     for line in lines:
         line = line.strip()
@@ -74,9 +86,10 @@ pdf_path = 'imported_questions/' + pdf_name
 # Extract text from the PDF
 text = extract_text_from_pdf(pdf_path)
 
+
 # Clean the extracted text to remove whitespace
 cleaned_text = clean_text(text)
-
+print(cleaned_text)
 # Split the cleaned text into lines
 lines = cleaned_text.split('\n')
 
@@ -91,29 +104,27 @@ answers = []
 current_question = []
 current_answer = []
 
-# Regular expression to match question numbers at the beginning of the line
-question_number_pattern = re.compile(r'^\(\d+\)|^\d+\.')
-question_answer_pattern = re.compile('^(?i)answer:')
 
-count = 1
+
 
 # Process each line
 for line in lines:
     line = line.strip()  # Remove leading and trailing whitespace
     if question_answer_pattern.match(line):
         # If the line starts with "ANSWER:", it's an answer
-        current_answer.append(line.replace("ANSWER:", "").strip())
         #print(current_answer)
-    elif question_number_pattern.match(line) and (current_answer or count == 1):
+        #print(line)
+        current_answer.append(re.sub("(?i)^ANSWER:", "", line))
+        #print(current_answer)
+    elif question_number_pattern.match(line) and current_answer:
         # If the line starts with a question number, start a new question
         if current_question:
             questions.append(" ".join(current_question).strip())
             answers.append(" ".join(current_answer).strip())
             current_question = []
             current_answer = []
-            count += 1
         line = question_number_pattern.sub("", line).strip()
-        print(line)
+        # print(line)
         current_question = [line]
         #print(current_question)
     elif line:
