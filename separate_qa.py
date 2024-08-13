@@ -85,16 +85,19 @@ pdf_path = 'imported_questions/' + pdf_name
 
 # Extract text from the PDF
 text = extract_text_from_pdf(pdf_path)
-
+#print(text)
 
 # Clean the extracted text to remove whitespace
 cleaned_text = clean_text(text)
-print(cleaned_text)
+#print(cleaned_text)
 # Split the cleaned text into lines
 lines = cleaned_text.split('\n')
 
 # Merge lines where question numbers are on a separate line
-lines = merge_question_lines(lines)
+#lines = merge_question_lines(lines)
+
+#for line in lines:
+   # print(line)
 
 # Initialize lists to hold questions and answers
 questions = []
@@ -106,10 +109,14 @@ current_answer = []
 
 
 
-
+count = 1
 # Process each line
 for line in lines:
     line = line.strip()  # Remove leading and trailing whitespace
+    #print(line)
+    if count == 1:
+        line = question_number_pattern.sub("", line).strip()
+    count += 1
     if question_answer_pattern.match(line):
         # If the line starts with "ANSWER:", it's an answer
         #print(current_answer)
@@ -130,7 +137,7 @@ for line in lines:
     elif line:
         # Continue adding lines to the current question or answer
         if current_answer:
-            current_answer.append(line)
+            current_answer.append(re.sub("^\d", "", line))
             #print(current_answer)
             #print(line)
         else:
@@ -147,8 +154,8 @@ if current_answer:
 # Print lengths and samples of the lists for debugging
 print(f"Number of questions: {len(questions)}")
 print(f"Number of answers: {len(answers)}")
-print("Sample questions:", questions[0])
-print("Sample answers:", answers[0])
+#print("Sample questions:", questions[0])
+#print("Sample answers:", answers[0])
 
 # Handle length mismatch
 # If there are more questions than answers, add empty answers
