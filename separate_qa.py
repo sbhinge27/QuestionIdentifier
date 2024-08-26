@@ -18,11 +18,11 @@ def extract_text_from_pdf(pdf_path):
         rect = page.rect
         if page_num == 0:
             if type_of_file == "nonUSGO":
-                height = 50
+                height = 80
             else:
                 height = 140
         else:
-            height = 50
+            height = 80
         clip = fitz.Rect(0, height, rect.width, rect.height-height)
         text += page.get_text(clip=clip)
     return text
