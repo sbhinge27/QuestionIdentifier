@@ -18,11 +18,11 @@ def extract_text_from_pdf(pdf_path):
         rect = page.rect
         if page_num == 0:
             if type_of_file == "nonUSGO":
-                height = 80
+                height = 60
             else:
                 height = 140
         else:
-            height = 80
+            height = 60
         clip = fitz.Rect(0, height, rect.width, rect.height-height)
         text += page.get_text(clip=clip)
     return text
@@ -38,7 +38,8 @@ def clean_text(text):
     excluded_patterns = [
         r'^Extra Question',
         r'Only read if moderator botches a question.',
-        r'Tossups'
+        r'Tossups',
+        r'Check the score'
         # Add more headers or footers if needed
     ]
 
@@ -50,7 +51,8 @@ def clean_text(text):
             if question_number_pattern.match(line):
                 q1_read = True
                 cleaned_lines.append(line)
-        else:
+        else: 
+            if not any(re.match(pattern, line) for pattern in excluded_patterns):
                 cleaned_lines.append(line)
 
         
