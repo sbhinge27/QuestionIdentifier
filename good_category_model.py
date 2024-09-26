@@ -11,7 +11,7 @@ file_path = 'question_database.csv'  # Update with your actual file path
 data = pd.read_csv(file_path)
 
 # Filter out the well-performing categories
-good_categories = ['Geography', 'History', 'Literature', 'Science']
+good_categories = ['Geography', 'History', 'Literature', 'Science', 'Fine Arts']
 
 # Filter the dataset to include only these categories
 filtered_data = data[data['Category'].isin(good_categories)]
