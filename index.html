@@ -13,13 +13,23 @@
             margin-top: 20px;
             font-weight: bold;
         }
+        /* Style the textarea */
+        #question {
+            width: 100%;  /* Full width */
+            min-height: 50px;  /* Minimum height */
+            max-height: 200px;  /* Maximum height */
+            resize: vertical;  /* Allow vertical resizing */
+            padding: 10px;  /* Padding for better UX */
+            font-size: 16px;  /* Font size */
+            box-sizing: border-box;  /* Include padding in width/height */
+        }
     </style>
 </head>
 <body>
     <h1>Question Category Classifier</h1>
     <p>Enter a question and the system will predict its category:</p>
     
-    <input type="text" id="question" placeholder="Enter your question here" style="width: 300px;" />
+    <textarea id="question" placeholder="Enter your question here"></textarea>
     <button onclick="classifyQuestion()">Submit</button>
     
     <div id="result"></div>
