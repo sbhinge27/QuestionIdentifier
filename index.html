@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question Category Classifier</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Question Category Classifier</h1>
+    <p>Enter a question and the system will predict its category:</p>
+    
+    <input type="text" id="question" placeholder="Enter your question here" style="width: 300px;" />
+    <button onclick="classifyQuestion()">Submit</button>
+    
+    <div id="result"></div>
+
+    <script>
+        async function classifyQuestion() {
+            const question = document.getElementById('question').value;
+
+            if (!question) {
+                alert('Please enter a question.');
+                return;
+            }
+
+            // Make the API call to the Flask backend
+            const response = await fetch('http://127.0.0.1:5000/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ question }),
+            });
+
+            const data = await response.json();
+
+            // Display the result
+            document.getElementById('result').innerText = `Predicted Category: ${data.category}`;
+        }
+    </script>
+</body>
+</html>
